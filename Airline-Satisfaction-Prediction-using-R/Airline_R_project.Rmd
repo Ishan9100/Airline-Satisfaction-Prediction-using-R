@@ -1,0 +1,151 @@
+```{r}
+# Installing the Required Libraries
+
+library(ggplot2)
+library(tidyverse)
+library(tigerstats)
+library(tibble)
+library(dplyr)
+library(stringr)
+library(SmartEDA)
+library(kernlab)
+library(arules)
+library(readxl)
+library(readr)
+library(ggpubr)
+library(naniar)
+library(MASS)
+```
+
+
+```{r}
+# Loading the Data
+
+data <- read.csv("S:/PDA_Project/test.csv")
+head(data)
+```
+```{r}
+# Manual encoding: 1 for "satisfied", 0 for "neutral or dissatisfied"
+data$satisfaction_encoded <- ifelse(data$satisfaction == "satisfied", 1, 0)
+
+# Print the resulting data frame
+head(data)
+```
+
+
+
+
+
+```{r}
+# Number of observations (rows) in the dataset
+num_observations <- nrow(data)  
+
+# Number of attributes (columns) in the dataset
+num_attributes <- ncol(data)    
+
+# Create a string containing the number of observations and attributes
+result <- paste("Number of Observations:", num_observations, "\nNumber of Attributes:", num_attributes)
+
+# Print the result to the console
+cat(result)
+
+```
+
+```{r}
+data_types <- sapply(data, class)
+data_types
+```
+
+```{r}
+# Checking for missing values
+
+missing_values <- colSums(is.na(data))
+missing_values
+```
+```{r}
+library(dplyr)
+# Exclude the missing observations
+data <-data %>%
+na.omit()       
+dim(data)
+```
+```{r}
+# Checking for missing values
+
+missing_values <- colSums(is.na(data))
+missing_values
+```
+```{r}
+# Histogram of Age by Gender
+
+ggplot(data, aes(x = Age, fill = Gender)) +
+  geom_histogram(binwidth = 5, fill= "red",color = "black", alpha = 0.7) +
+  labs(title = "Histogram of Age by Gender",
+       x = "Age",
+       y = "Frequency") +
+  facet_wrap(~Gender, scales = "free")
+```
+```{r}
+# Boxplot of Flight Distance
+
+ggplot(data, aes(x  = Flight.Distance)) +
+  geom_boxplot(fill = "blue", color = "black", alpha = 0.7) +
+  labs(title = "Boxplot of Flight Distance",
+       x  = "Flight Distance")
+```
+```{r}
+# Boxplot of Flight Distance
+
+boxplot(data$Flight.Distance, main = "Boxplot of Flight Distance",
+        xlab = "Flight Distance", horizontal = TRUE)
+```
+```{r}
+# Overlay Histogram of Age and Count
+ggplot(data, aes(x = Age, fill = Gender)) +
+  geom_histogram(bins = 10, color = "black") +
+  ggtitle("Overlay Histogram of Age and Count")
+
+```
+```{r}
+# Dimension of Data
+
+dim(data)
+```
+```{r}
+# Summary of the Data
+
+summary(data)
+```
+```{r}
+# Creating a new dataframe called random_sample
+random_sample <- data %>%
+  sample_n(50)
+
+# Displaying the first 20 rows of the sampled Data
+head(random_sample, 20)
+```
+```{r}
+# T-Test
+t.test(random_sample$Online.boarding, mu = mean(data$Online.boarding))
+```
+```{r}
+# Linear Regression
+
+lm_model <- lm(satisfaction_encoded ~ Arrival.Delay.in.Minutes, data = data)
+
+#here we created a scatter plot with regression line
+ggplot(data, aes(x = Arrival.Delay.in.Minutes, y = satisfaction_encoded),aes(x = Cleanliness, y = satisfaction_encoded)) +
+  geom_point() +                # Scatter plot points
+  geom_smooth(method = "lm",    # Add linear regression line
+              se = FALSE,        # Don't show confidence interval
+              col = "blue") +    # Line color
+  labs(title = "Linear Regression: Arrival Delay vs Satisfaction",
+       x = "Arrival Delay",
+       y = "Satisfaction") +
+  theme_minimal()
+```
+
+## Conclusion
+We can say that as the Arrival Delay increases, The satisfaction decreases and hence it is Inversely proportional.
+
+
